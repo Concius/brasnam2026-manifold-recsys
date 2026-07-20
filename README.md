@@ -127,8 +127,6 @@ Resumo das tabelas principais (números completos no paper):
 | **LightGCN** | **0.171 ± 0.001** | **0.142 ± 0.001** | **0.061 ± 0.000** | **0.295 ± 0.005** | 0.719 ± 0.001 |
 | KGAT | 0.143 ± 0.001 | 0.122 ± 0.001 | 0.049 ± 0.001 | 0.184 ± 0.004 | 0.711 ± 0.003 |
 
-Em ambos os datasets, **LightGCN supera KGAT em todas as métricas de recomendação**, e o gap de NP@10 é particularmente grande no Yelp2018 (0.234 vs 0.068 — o KGAT preserva muito pouco da vizinhança original do grafo de interação).
-
 Os JSONs com todos os números detalhados são gerados em `brasnam_experiments/` ao rodar o notebook.
 
 ---
