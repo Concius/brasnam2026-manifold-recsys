@@ -60,16 +60,6 @@ brasnam_experiments/             # JSONs de resultados + figuras
 3. Execute as Seções 1 a 8 (definições — rápido).
 4. Execute a **Seção 9** (*smoke test*) — deve terminar em ~10 minutos. Se algo falhar aqui, conserte antes de continuar.
 5. Execute a **Seção 10** (experimentos completos). Tempo total estimado em GPU T4:
-
-   | Experimento | Tempo aproximado |
-   |---|---|
-   | Tabela A (ML-1M-LOO, 3 modelos × 3 seeds) | ~3 h |
-   | Tabela B (ML-1M-random, 2 modelos × 3 seeds) | ~2 h |
-   | Tabela B (Yelp2018, 2 modelos × 3 seeds) | ~6 h |
-   | Tabela B (Amazon-Book, 2 modelos × **1 seed cada cell**) | ~6 h por seed |
-
-   Os runs do Amazon-Book estão em **três cells separados** (um por seed) para sobreviverem aos timeouts de sessão do Colab. Se um crashar, o próximo retoma do ponto onde parou (graças à *resume logic*).
-
 6. Execute a **Seção 11** para consolidar os três JSONs do Amazon-Book na tabela final agregada.
 
 ### Opção 2 — Local (com GPU NVIDIA)
