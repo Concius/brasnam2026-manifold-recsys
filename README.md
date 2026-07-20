@@ -2,7 +2,7 @@
 
 Código-fonte e notebook de reprodução do artigo aceito no **XV BraSNAM (Brazilian Workshop on Social Network Analysis and Mining), 2026**.
 
-> **Marinho, A. A.; Pedronette, D. C. G.** *Geometria dos Embeddings em Recomendação: GNNs e Transformers sob Manifold Learning.* XV BraSNAM, 2026. Porto Alegre, RS, Brasil.
+> **Marinho, A. A.; Pedronette, D. C. G.** *Geometria dos Embeddings em Recomendação: GNNs e Transformers sob Manifold Learning.* XV BraSNAM, 2026. Porto Alegre: SBC. (Evento realizado em Gramado, RS.)
 
 ---
 
@@ -20,13 +20,13 @@ Duas métricas geométricas com **grafo de interação como referência**:
 - **NP@10** — *Neighborhood Preservation*: fração dos 10 vizinhos no espaço de embedding que também estão entre os 10 vizinhos no grafo de interação (Jaccard).
 - **LDD@10** — *Local Distance Distortion*: distorção média das distâncias locais entre o espaço de embedding e o grafo de interação.
 
-Todos os experimentos rodam com **3 sementes** (2020, 2021, 2022) e reportam média ± desvio padrão.
+A maioria dos experimentos roda com **3 sementes** (2020, 2021, 2022), reportando média ± desvio padrão. Duas exceções, por restrição computacional, estão sinalizadas ao longo do texto: o **Amazon-Book** roda com **semente única (2020)**, e a análise geométrica do **LightGCN no Yelp2018** usa **2 sementes** (a 3ª não foi executada).
 
 ### Principais achados
 
-- **SASRec domina** a predição do próximo item em ML-1M-LOO (HR@10 ≈ 0.24 vs ≈ 0.14 do LightGCN).
+- **SASRec domina** a predição do próximo item em ML-1M-LOO (HR@10 ≈ 0.25 vs ≈ 0.08 do LightGCN).
 - **LightGCN iguala ou supera o KGAT** em recomendação geral nos três datasets, **contradizendo a suposição** de que grafos de conhecimento melhoram performance sistematicamente.
-- A análise geométrica mostra que o KGAT espalha mais os embeddings (NP@10 menor, LDD@10 similar), enquanto LightGCN preserva melhor a vizinhança original do grafo de interação.
+- A análise geométrica mostra que o KGAT preserva menos a vizinhança do grafo de interação (NP@10 menor), enquanto o LightGCN mantém melhor essa estrutura original — o que acompanha a vantagem no ranking.
 
 ---
 
@@ -59,8 +59,15 @@ brasnam_experiments/             # JSONs de resultados + figuras
 2. **Runtime → Change runtime type → GPU** (T4 ou superior).
 3. Execute as Seções 1 a 8 (definições — rápido).
 4. Execute a **Seção 9** (*smoke test*) — deve terminar em ~10 minutos. Se algo falhar aqui, conserte antes de continuar.
-5. Execute a **Seção 10** (experimentos completos). Tempo total estimado em GPU T4:
-6. Execute a **Seção 11** para consolidar os três JSONs do Amazon-Book na tabela final agregada.
+5. Execute a **Seção 10** (experimentos completos). Tempo total estimado em GPU T4 (varia com o hardware alocado):
+
+   | Dataset | Modelos | Tempo aproximado (3 seeds, exceto onde indicado) |
+   |---|---|---|
+   | MovieLens-1M | LightGCN, KGAT, SASRec | algumas horas |
+   | Yelp2018 | LightGCN, KGAT | ~1 dia |
+   | Amazon-Book | LightGCN, KGAT | ~22–44h **por seed** (rodado com 1 seed) |
+
+6. Execute a **Seção 11** para consolidar os JSONs do Amazon-Book na tabela final agregada.
 
 ### Opção 2 — Local (com GPU NVIDIA)
 
@@ -94,40 +101,42 @@ FORCE_OVERWRITE = True   # definido na Seção 8
 | **KGAT com atenção TransR** (era Bi-Interaction GCN sem atenção) | A implementação anterior não era KGAT — o mecanismo de atenção do paper (Wang et al. 2019, Eq. 4–5) estava ausente. Cross-validado com [LunaBlack/KGAT-pytorch](https://github.com/LunaBlack/KGAT-pytorch). |
 | **SASRec com full-corpus evaluation** (era 1+100 sampled) | A avaliação amostrada (Krichene & Rendle, 2020) é incomparável com LightGCN/KGAT, que avaliam contra todo o catálogo. |
 | **SASRec apenas em ML-1M** | Yelp2018 e Amazon-Book do LightGCN repo não preservam ordem cronológica. |
-| **KGAT eval em todos os usuários** (era amostra de 1000) | A amostra anterior era não-determinística. |
+| **Ranking do KGAT avaliado contra todos os usuários** (era amostra não-determinística de 1000) | Torna a avaliação de ranking determinística. (Distinto da amostra de 1000 *itens* usada só nas métricas geométricas NP/LDD — ver §4.2 do artigo.) |
 | **NP@10 / LDD@10 com grafo de interação como referência** (era o próprio embedding) | A definição anterior media fidelidade do t-SNE ao embedding, não estrutura intrínseca dos dados. Responde diretamente à crítica dos revisores. |
 | **LightGCN também avaliado com NP/LDD** | Faltavam números do LightGCN para esses dois indicadores na versão anterior. |
-| **3 seeds + média ± std em todos os experimentos** | Reprodutibilidade — atende ao revisor 2. |
+| **3 seeds + média ± std** (onde computacionalmente viável) | Reprodutibilidade — atende ao revisor 2. Exceções sinalizadas: Amazon-Book (1 seed) e geometria do LightGCN no Yelp2018 (2 seeds). |
 
 ---
 
 ## Resultados
 
-Resumo das tabelas principais (números completos no paper):
+Resumo das tabelas principais (números completos e desvios no paper):
 
 **Tabela A — Next-item prediction (ML-1M-LOO, full-corpus, 3 seeds)**
 
 | Modelo | HR@10 | Recall@20 | NDCG@10 |
 |---|---|---|---|
-| LightGCN | ~0.11 | ~0.18 | ~0.05 |
-| KGAT | ~0.09 | ~0.14 | ~0.04 |
-| **SASRec** | **~0.24** | **~0.32** | **~0.13** |
+| LightGCN | 0.084 | 0.149 | 0.041 |
+| KGAT | 0.079 | 0.136 | 0.039 |
+| **SASRec** | **0.249** | **0.364** | **0.134** |
 
 **Tabela B — Recomendação geral (Yelp2018, full-corpus, 3 seeds)**
 
 | Modelo | HR@10 | Recall@20 | NDCG@10 | NP@10 | LDD@10 |
 |---|---|---|---|---|---|
-| **LightGCN** | **0.181 ± 0.001** | **0.073 ± 0.000** | **0.037 ± 0.000** | **0.234 ± 0.003** | 0.740 ± 0.004 |
-| KGAT | 0.160 ± 0.000 | 0.064 ± 0.000 | 0.032 ± 0.000 | 0.068 ± 0.005 | 0.768 ± 0.002 |
+| **LightGCN** | **0.182 ± 0.001** | **0.073 ± 0.000** | **0.037 ± 0.000** | **0.234 ± 0.003** † | 0.740 ± 0.004 † |
+| KGAT | 0.161 ± 0.000 | 0.064 ± 0.000 | 0.032 ± 0.000 | 0.068 ± 0.005 | 0.768 ± 0.002 |
 
-**Tabela B — Recomendação geral (Amazon-Book, full-corpus, 3 seeds)**
+† NP/LDD do LightGCN no Yelp2018 são média de **2 seeds** (a análise geométrica da 3ª seed não foi executada). As métricas de ranking usam as 3 seeds.
+
+**Tabela B — Recomendação geral (Amazon-Book, full-corpus, 1 seed: 2020)**
 
 | Modelo | HR@10 | Recall@20 | NDCG@10 | NP@10 | LDD@10 |
 |---|---|---|---|---|---|
-| **LightGCN** | **0.171 ± 0.001** | **0.142 ± 0.001** | **0.061 ± 0.000** | **0.295 ± 0.005** | 0.719 ± 0.001 |
-| KGAT | 0.143 ± 0.001 | 0.122 ± 0.001 | 0.049 ± 0.001 | 0.184 ± 0.004 | 0.711 ± 0.003 |
+| **LightGCN** | **0.173** | **0.142** | **0.061** | **0.292** | 0.719 |
+| KGAT | 0.145 | 0.124 | 0.049 | 0.186 | 0.709 |
 
-Os JSONs com todos os números detalhados são gerados em `brasnam_experiments/` ao rodar o notebook.
+Amazon-Book roda com **semente única (2020)** por custo computacional; completar as seeds é trabalho futuro. Os JSONs com todos os números detalhados são gerados em `brasnam_experiments/` ao rodar o notebook.
 
 ---
 
