@@ -2,7 +2,7 @@
 
 Código-fonte e notebook de reprodução do artigo aceito no **XV BraSNAM (Brazilian Workshop on Social Network Analysis and Mining), 2026**.
 
-> **Marinho, A. A.; Pedronette, D. C. G.** *Geometria dos Embeddings em Recomendação: GNNs e Transformers sob Manifold Learning.* XV BraSNAM, 2026. Porto Alegre: SBC. (Evento realizado em Gramado, RS.)
+> **Marinho, A. A.; Pedronette, D. C. G.** *Geometria dos Embeddings em Recomendação: GNNs e Transformers sob Manifold Learning.* XV BraSNAM, 2026. Porto Alegre: SBC.
 
 ---
 
@@ -167,9 +167,16 @@ Se este código for útil para a sua pesquisa, cite:
   year      = {2026},
   address   = {Porto Alegre, RS, Brasil},
   publisher = {Sociedade Brasileira de Computa\c{c}\~ao (SBC)},
+  doi       = {10.5753/brasnam.2026.22535},
+  url       = {https://doi.org/10.5753/brasnam.2026.22535},
 }
 ```
 
+---
+
+## Licença
+
+[MIT](LICENSE) — uso livre com atribuição.
 ---
 
 ## Licença
